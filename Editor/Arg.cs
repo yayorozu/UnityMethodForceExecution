@@ -14,21 +14,19 @@ namespace Yorozu.MethodExecute.EditorTools
 	/// <summary>
 	/// もう少し汎用化したい
 	/// </summary>
-	public abstract class Arg<T>
+	internal abstract class Arg<T>
 	{
+		private int _index;
+		private readonly List<string> names = new List<string>(0);
+		private readonly List<T> values = new List<T>(0);
 		internal T this[int index]
 		{
 			get => values[index];
 			set => values[index] = value;
 		}
-
-		private List<T> values = new List<T>(0);
-		private List<string> names = new List<string>(0);
-
-		private int _index;
 		internal int Length => values.Count;
 
-		public virtual bool IsTarget(Type type)
+		internal virtual bool IsTarget(Type type)
 		{
 			return type == typeof(T);
 		}
@@ -50,10 +48,9 @@ namespace Yorozu.MethodExecute.EditorTools
 			{
 				var i = value as IResetIndex;
 				if (i != null)
-				{
 					i.ResetIndex();
-				}
 			}
+
 			_index = 0;
 		}
 
@@ -69,206 +66,138 @@ namespace Yorozu.MethodExecute.EditorTools
 		{
 			for (var i = 0; i < values.Count; i++)
 			{
-				values[i] = OnGUIElement(names[i], values[i]);
+				values[i] = OnGUIElement(i, names[i], values[i]);
 			}
 		}
 
-		protected abstract T OnGUIElement(string name, T value);
+		protected abstract T OnGUIElement(int index, string name, T value);
 	}
 
-	public class ArgInt : Arg<int>
-    {
-        public override bool IsTarget(Type type)
-        {
-            return type == typeof(int) ||
-                   type == typeof(uint) ||
-                   type.IsEnum;
-        }
+	internal class ArgInt : Arg<int>
+	{
+		internal override bool IsTarget(Type type)
+		{
+			return type == typeof(int) ||
+			       type == typeof(uint);
+		}
 
-        protected override int OnGUIElement(string name, int value)
-        {
-            return EditorGUILayout.IntField(name, value);
-        }
-    }
+		protected override int OnGUIElement(int index, string name, int value)
+		{
+			return EditorGUILayout.IntField(name, value);
+		}
+	}
 
-    public class ArgBool : Arg<bool>
-    {
-        protected override bool OnGUIElement(string name, bool value)
-        {
-            return EditorGUILayout.Toggle(name, value);
-        }
-    }
+	internal class ArgBool : Arg<bool>
+	{
+		protected override bool OnGUIElement(int index, string name, bool value)
+		{
+			return EditorGUILayout.Toggle(name, value);
+		}
+	}
 
-    public class ArgFloat : Arg<float>
-    {
-        public override bool IsTarget(Type type)
-        {
-            return type == typeof(float) ||
-                type == typeof(long);
-        }
+	internal class ArgFloat : Arg<float>
+	{
+		internal override bool IsTarget(Type type)
+		{
+			return type == typeof(float) ||
+			       type == typeof(long);
+		}
 
-        protected override float OnGUIElement(string name, float value)
-        {
-            return EditorGUILayout.FloatField(name, value);
-        }
-    }
+		protected override float OnGUIElement(int index, string name, float value)
+		{
+			return EditorGUILayout.FloatField(name, value);
+		}
+	}
 
-    public class ArgString : Arg<string>
-    {
-        protected override string OnGUIElement(string name, string value)
-        {
-            return EditorGUILayout.TextField(name, value);
-        }
-    }
+	internal class ArgString : Arg<string>
+	{
+		protected override string OnGUIElement(int index, string name, string value)
+		{
+			return EditorGUILayout.TextField(name, value);
+		}
+	}
 
-    public class ArgVector2 : Arg<Vector2>
-    {
-        protected override Vector2 OnGUIElement(string name, Vector2 value)
-        {
-            return EditorGUILayout.Vector2Field(name, value);
-        }
-    }
+	internal class ArgVector2 : Arg<Vector2>
+	{
+		protected override Vector2 OnGUIElement(int index, string name, Vector2 value)
+		{
+			return EditorGUILayout.Vector2Field(name, value);
+		}
+	}
 
-    public class ArgVector3 : Arg<Vector3>
-    {
-        protected override Vector3 OnGUIElement(string name, Vector3 value)
-        {
-            return EditorGUILayout.Vector3Field(name, value);
-        }
-    }
+	internal class ArgVector3 : Arg<Vector3>
+	{
+		protected override Vector3 OnGUIElement(int index, string name, Vector3 value)
+		{
+			return EditorGUILayout.Vector3Field(name, value);
+		}
+	}
 
-    public class ArgVector2Int : Arg<Vector2Int>
-    {
-        protected override Vector2Int OnGUIElement(string name, Vector2Int value)
-        {
-            return EditorGUILayout.Vector2IntField(name, value);
-        }
-    }
+	internal class ArgVector2Int : Arg<Vector2Int>
+	{
+		protected override Vector2Int OnGUIElement(int index, string name, Vector2Int value)
+		{
+			return EditorGUILayout.Vector2IntField(name, value);
+		}
+	}
 
-    public class ArgVector3Int : Arg<Vector3Int>
-    {
-        protected override Vector3Int OnGUIElement(string name, Vector3Int value)
-        {
-            return EditorGUILayout.Vector3IntField(name, value);
-        }
-    }
+	internal class ArgVector3Int : Arg<Vector3Int>
+	{
+		protected override Vector3Int OnGUIElement(int index, string name, Vector3Int value)
+		{
+			return EditorGUILayout.Vector3IntField(name, value);
+		}
+	}
 
-    public class ArgColor : Arg<Color>
-    {
-        protected override Color OnGUIElement(string name, Color value)
-        {
-            return EditorGUILayout.ColorField(name, value);
-        }
-    }
+	internal class ArgColor : Arg<Color>
+	{
+		protected override Color OnGUIElement(int index, string name, Color value)
+		{
+			return EditorGUILayout.ColorField(name, value);
+		}
+	}
 
-    public class ArgValue : Arg<Value>
-    {
-	    protected override Value OnGUIElement(string name, Value value)
-	    {
-		    return value.OnGUI();
-	    }
-    }
+	internal class ArgValue : Arg<Value>
+	{
+		protected override Value OnGUIElement(int index, string name, Value value)
+		{
+			return value.OnGUI();
+		}
+	}
 
-    public class ArgArray : Arg<ArrayList>
-    {
-	    public override bool IsTarget(Type type)
-	    {
-		    return type.IsArray || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
-	    }
+	internal class ArgArray : Arg<ArrayList>
+	{
+		internal override bool IsTarget(Type type)
+		{
+			return type.IsArray || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+		}
 
-	    internal void Add(string label, Type type)
-	    {
-		    var elementType = type.IsArray ?
-			    type.GetElementType() :
-			    type.GetGenericArguments()[0];
+		internal void Add(string label, Type type)
+		{
+			Add("", new ArrayList(label, type));
+		}
 
-		    Add("", new ArrayList(label + " (" + elementType.Name + ")", elementType));
-	    }
+		protected override ArrayList OnGUIElement(int index, string name, ArrayList value)
+		{
+			return value.OnGUI();
+		}
+	}
 
-	    protected override ArrayList OnGUIElement(string name, ArrayList value)
-	    {
-		    return value.OnGUI();
-	    }
-    }
+	internal class ArgEnum : Arg<EnumValue>
+	{
+		internal override bool IsTarget(Type type)
+		{
+			return type.IsEnum;
+		}
 
-    /// <summary>
-    /// Array もしくは List のキャッシュ用
-    /// </summary>
-    [Serializable]
-    public class ArrayList : IResetIndex
-    {
-	    private string _label;
-	    private Type _elementType;
+		internal void Add(Type type)
+		{
+			Add("", new EnumValue(type));
+		}
 
-	    public ArrayList(string label, Type type)
-	    {
-		    _label = label;
-		    _elementType = type;
-	    }
-
-	    /// <summary>
-	    /// Arrayの中身
-	    /// </summary>
-	    private ArgValue Values = new ArgValue();
-
-	    public ArrayList OnGUI()
-	    {
-		    // Header
-		    using (new GUILayout.HorizontalScope())
-		    {
-			    EditorGUILayout.LabelField(string.Format("{0} [{1}]", _label, Values.Length));
-			    GUILayout.FlexibleSpace();
-			    // 要素の追加
-			    if (GUILayout.Button(EditorGUIUtility.TrIconContent("Toolbar Plus"), "RL FooterButton", GUILayout.Width(16)))
-			    {
-				    var v = new Value();
-				    v.Set(_elementType, "");
-				    Values.Add("", v);
-			    }
-		    }
-		    for (var i = 0; i < Values.Length; i++)
-		    {
-			    using (new EditorGUILayout.HorizontalScope())
-			    {
-				    Values[i].OnGUI();
-				    if (GUILayout.Button(EditorGUIUtility.TrIconContent("Toolbar Minus"), "RL FooterButton", GUILayout.Width(16)))
-				    {
-					    Values.Remove(i);
-					    EditorGUIUtility.ExitGUI();
-				    }
-			    }
-		    }
-		    return this;
-	    }
-
-	    public void ResetIndex()
-	    {
-		    Values.ResetIndex();
-	    }
-
-	    public object GetValue(Type type)
-	    {
-
-		    if (type.IsArray)
-		    {
-			    var objects = new object[Values.Length];
-
-			    var array = (Array) Activator.CreateInstance(type, new object[] {Values.Length});
-			    for (var i = 0; i < Values.Length; i++)
-			    {
-					array.SetValue(Values.Get().GetValue(_elementType), i);
-			    }
-			    return array;
-		    }
-
-		    type = typeof(List<>).MakeGenericType(type);
-		    IList list = (IList)Activator.CreateInstance(type);
-		    for (var i = 0; i < Values.Length; i++)
-		    {
-			    list.Add(Values.Get().GetValue(_elementType));
-		    }
-
-		    return list;
-	    }
-    }
+		protected override EnumValue OnGUIElement(int index, string name, EnumValue value)
+		{
+			return value.OnGUI();
+		}
+	}
 }
