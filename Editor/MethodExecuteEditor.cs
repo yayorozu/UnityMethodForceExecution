@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -14,7 +12,7 @@ namespace Yorozu.MethodExecute.EditorTools
     public class MethodExecuteEditor : EditorWindow
     {
         [MenuItem("Tools/ExecMethod")]
-        private static void Show()
+        private static void ShowWindow()
         {
             var window = GetWindow<MethodExecuteEditor>();
             window.titleContent = new GUIContent("ExecMethod");
